@@ -64,6 +64,3 @@ let () =
     | e ->
 	eprintf "Anomaly: %s\n@." (Printexc.to_string e);
 	exit 2
-
-
-
