@@ -16,5 +16,9 @@ let error ?(loc=dummy_loc) f =
 
 let file ?debug:(b=false) (p: Ast.pfile) : Ast.tfile =
   debug := b;
-  failwith "TODO"
+  let type_class ?(debug=false) (c: Ast.pclass) : Ast.tclass =
+    failwith "TODO"
+  in
+  List.map (type_class ~debug:b) p
+
 
