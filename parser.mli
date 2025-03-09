@@ -1,7 +1,6 @@
-
 (* The type of tokens. *)
 
-type token = 
+type token =
   | VOID
   | VERTICALBARVERTICALBAR
   | THIS
@@ -25,16 +24,16 @@ type token =
   | INT
   | INSTANCEOF
   | IF
-  | IDENT of (string)
+  | IDENT of string
   | FOR
   | EXTENDS
-  | EQOP of (Ast.binop)
+  | EQOP of Ast.binop
   | EQ
   | EOF
   | ELSE
   | DOT
-  | CST of (Ast.constant)
-  | COMP of (Ast.binop)
+  | CST of Ast.constant
+  | COMP of Ast.binop
   | COMMA
   | CLASS
   | BOOLEAN
@@ -47,4 +46,4 @@ exception Error
 
 (* The monolithic API. *)
 
-val file: (Lexing.lexbuf -> token) -> Lexing.lexbuf -> (Ast.pfile)
+val file : (Lexing.lexbuf -> token) -> Lexing.lexbuf -> Ast.pfile

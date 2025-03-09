@@ -1,5 +1,4 @@
 (executable
  (name minijava)
  (promote (until-clean))
- (flags (-g))
- )
+ (flags (-g)))
