@@ -78,7 +78,7 @@ type typ = Tvoid | Tnull | Tboolean | Tint | Tclass of class_
 
 and class_ = {
   class_name : string;
-  mutable class_extends : class_;
+  mutable class_extends : class_ option;
   class_methods : (string, method_) Hashtbl.t;
   class_attributes : (string, attribute) Hashtbl.t;
 }
