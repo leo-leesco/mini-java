@@ -129,12 +129,14 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
       let (m,a)=count_methods_attributes declarations in
           {
             class_name = cls;
-            class_extends = (match Hashtbl.find classes cls  with | None -> None | Some parent -> Some (class_from_string parent ));
+            class_extends = (match (Hashtbl.find classes cls)  with
+          | None -> None
+          | Some parent -> Some (class_from_string parent));
           class_methods = Hashtbl.create m;
           class_attributes = Hashtbl.create a;
           }
     in
 
-  let classes = Seq.map class_from_string (Hashtbl.to_seq_keys classes) |> List.of_seq in
+ let classes =  (Hashtbl.to_seq_keys classes) |> (Seq.map class_from_string) |> List.of_seq in
 
     failwith "TODO"
