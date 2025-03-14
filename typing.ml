@@ -112,3 +112,29 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
         classes
     in
     assert_acyclical classes;
+
+    (** @returns (number of methods, number of attributes)*)
+    let count_methods_attributes (decl : pdecl list) =
+      List.fold_left
+        (fun (m, a) declaration ->
+          match declaration with
+          | PDattribute _ -> (m, a + 1)
+          | PDmethod _ -> (m + 1, a)
+          | _ -> (m, a))
+        (0, 0) decl
+    in
+
+    let rec class_from_string (cls : string) : class_ =
+      let (this,parent,declarations) = pclass_from_string cls in
+      let (m,a)=count_methods_attributes declarations in
+          {
+            class_name = cls;
+            class_extends = (match Hashtbl.find classes cls  with | None -> None | Some parent -> Some (class_from_string parent ));
+          class_methods = Hashtbl.create m;
+          class_attributes = Hashtbl.create a;
+          }
+    in
+
+  let classes = Seq.map class_from_string (Hashtbl.to_seq_keys classes) |> List.of_seq in
+
+    failwith "TODO"
