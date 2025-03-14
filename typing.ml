@@ -65,3 +65,50 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
         classes
     in
     assert_valid_extends classes;
+
+    let assert_acyclical (classes : (string, string option) Hashtbl.t) =
+      let in_cycle = Hashtbl.create (Hashtbl.length classes) in
+      (* Hashtbl.iter (fun k _ -> Hashtbl.add in_cycle k false) classes; *)
+
+      let rec is_cycle (turtle : string) (hare : string) =
+        match Hashtbl.find classes hare with
+        | None ->
+            Hashtbl.add in_cycle hare false;
+            false
+        | Some parent_hare -> (
+            match Hashtbl.find classes parent_hare with
+            | None ->
+                Hashtbl.add in_cycle hare false;
+                false
+            | Some hare -> (
+                let turtle = Option.get (Hashtbl.find classes turtle) in
+                if turtle = hare then (
+                  Hashtbl.add in_cycle turtle true;
+                  Hashtbl.add in_cycle hare true;
+                  true)
+                else
+                  try
+                    let already_visited =
+                      Hashtbl.find in_cycle turtle || Hashtbl.find in_cycle hare
+                    in
+                    if already_visited then true
+                    else
+                      let new_in_cycle = is_cycle turtle hare in
+                      Hashtbl.add in_cycle turtle new_in_cycle;
+                      Hashtbl.add in_cycle hare new_in_cycle;
+                      new_in_cycle
+                  with Not_found ->
+                    let new_in_cycle = is_cycle turtle hare in
+                    Hashtbl.add in_cycle turtle new_in_cycle;
+                    Hashtbl.add in_cycle hare new_in_cycle;
+                    new_in_cycle))
+      in
+
+      Hashtbl.iter
+        (fun this _ ->
+          if is_cycle this this then
+            let { loc }, _, _ = pclass_from_string this in
+            error ~loc "%s is in cyclic dependency" this)
+        classes
+    in
+    assert_acyclical classes;
