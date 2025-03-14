@@ -51,3 +51,17 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
         p;
       tree
     in
+
+    let assert_valid_extends (classes : (string, string option) Hashtbl.t) =
+      Hashtbl.iter
+        (fun this extends ->
+          match extends with
+          | Some cls ->
+              if not (Hashtbl.mem classes cls) then
+                let { loc }, _, _ = pclass_from_string this in
+                error ~loc "Invalid extends : superclass %s is never defined"
+                  this
+          | _ -> ())
+        classes
+    in
+    assert_valid_extends classes;
