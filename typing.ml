@@ -27,4 +27,15 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
           error ~loc "class %s already defined" this.id
         with Not_found -> assert_unique others)
   in
-  failwith "TODO"
+  assert_unique p;
+
+  try
+    let { loc; id }, _, _ =
+      List.find
+        (fun (_, ext, _) ->
+          match ext with Some ext -> ext.id = "String" | None -> false)
+        p
+    in
+    error ~loc "%s inherits from String" id
+  with Not_found ->
+    ();
