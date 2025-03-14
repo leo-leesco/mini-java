@@ -13,17 +13,17 @@ let error ?(loc = dummy_loc) f =
 
 let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
   debug := b;
-  let standalone =
-    List.filter (fun (name, extends, declarations) -> extends == None) p
+
+  let pclass_from_string (cls : string) : pclass =
+    List.find (fun (other, _, _) -> other.id = cls) p
   in
+
   let rec assert_unique (p : Ast.pfile) =
     match p with
     | [] -> ()
     | (this, _, _) :: others -> (
         try
-          let { loc; _ }, _, _ =
-            List.find (fun (other, _, _) -> this.id = other.id) others
-          in
+          let { loc; _ }, _, _ = pclass_from_string this.id in
           error ~loc "class %s already defined" this.id
         with Not_found -> assert_unique others)
   in
