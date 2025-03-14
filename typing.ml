@@ -39,3 +39,15 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
     error ~loc "%s inherits from String" id
   with Not_found ->
     ();
+
+    let classes =
+      let tree : (string, string option) Hashtbl.t =
+        Hashtbl.create (List.length p)
+      in
+      List.iter
+        (fun (this, extends, _) ->
+          Hashtbl.add tree this.id
+            (match extends with None -> None | Some cls -> Some cls.id))
+        p;
+      tree
+    in
