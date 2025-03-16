@@ -15,15 +15,15 @@ echo "Testing $2"
 
 echo
 
-rm -f syntax/bad/testfile-*.java
-# rm -f syntax/good/testfile-*.java
-rm -f typing/bad/testfile-*.java
-rm -f typing/good/testfile-*.java
-ocamllex split.mll
-ocaml split.ml syntax/bad/bad.split
-# ocaml split.ml syntax/good/good.split
-ocaml split.ml typing/bad/bad.split
-ocaml split.ml typing/good/good.split
+# rm -f syntax/bad/testfile-*.java
+# # rm -f syntax/good/testfile-*.java
+# rm -f typing/bad/testfile-*.java
+# rm -f typing/good/testfile-*.java
+# ocamllex split.mll
+# ocaml split.ml syntax/bad/bad.split
+# # ocaml split.ml syntax/good/good.split
+# ocaml split.ml typing/bad/bad.split
+# ocaml split.ml typing/good/good.split
 
 # tous les tests passent avec javac
 # for f in typing/good/*.java exec/*.java exec-fail/*.java; do
@@ -32,7 +32,7 @@ ocaml split.ml typing/good/good.split
 # done
 # for f in typing/bad/*.java; do
 #     if javac $f > /dev/null 2>&1 ; then
-#       echo "succès de javac sur $f"; exit 1
+#       echo "succÃ¨s de javac sur $f"; exit 1
 #     fi
 # done
 
@@ -93,7 +93,7 @@ percent=`expr 100 \* $score / $max`;
 
 echo -n "Part 1: $score/$max : $percent%"; }
 
-# partie 2 : tests d'analyse sémantique
+# partie 2 : tests d'analyse sÃ©mantique
 
 
 partie2 () {
@@ -143,7 +143,7 @@ echo    "Part 2: $score/$max : $percent%";
 }
 
 
-# partie 3 : tests d'exécution
+# partie 3 : tests d'exÃ©cution
 
 partie3 () {
 
