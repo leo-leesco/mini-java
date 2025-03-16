@@ -1,18 +1,11 @@
 open Ast
-open Class
 
 let debug = ref false
+let dummy_loc = (Lexing.dummy_pos, Lexing.dummy_pos)
 
-let file ?(debug = !debug) (p : Ast.pfile) : Ast.tfile =
-  Class.Assert.unique p;
-  Class.Assert.no_string_inheritance p;
+exception Error of Ast.location * string
 
-  let quick_look = Class.quick_look p in
-
-  Class.Assert.valid_extends p quick_look;
-  Class.Assert.acyclical p quick_look;
-
-  let classes = Class.classes quick_look p in
-  if debug then print_endline "Class tree built";
-
-  failwith "TODO"
+(* use the following function to signal typing errors, e.g.
+      error ~loc "unbound variable %s" id *)
+let error ?(loc = dummy_loc) f =
+  Format.kasprintf (fun s -> raise (Error (loc, s))) ("@[" ^^ f ^^ "@]")

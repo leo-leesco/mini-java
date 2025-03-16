@@ -43,7 +43,7 @@ let () =
     let f = Parser.file Lexer.next_token lb in
     close_in c;
     if !parse_only then exit 0;
-    let f = Typing.file ~debug f in
+    let f = File.get_type ~debug f in
     if !type_only then exit 0;
     let code = Compile.file ~debug f in
     let c = open_out (Filename.chop_suffix file ".java" ^ ".s") in
@@ -59,7 +59,7 @@ let () =
       report (lexeme_start_p lb, lexeme_end_p lb);
       eprintf "syntax error@.";
       exit 1
-  | Assert.Error (loc, s) ->
+  | Typing.Error (loc, s) ->
       report loc;
       eprintf "error: %s@." s;
       exit 1

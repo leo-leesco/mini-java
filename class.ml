@@ -40,21 +40,14 @@ let rec class_from_string (p : Ast.pfile)
   }
 
 let classes (classes : (string, string option) Hashtbl.t) (p : Ast.pfile) =
-  List.of_seq
-    (Seq.map (class_from_string p classes) (Hashtbl.to_seq_keys classes))
+  let class_tree = Hashtbl.create (Hashtbl.length classes) in
+  Hashtbl.iter
+    (fun cls _ -> Hashtbl.add class_tree cls (class_from_string p classes cls))
+    classes;
+  class_tree
 
-(** Assert that the classes are well formed @raise Error(location, comment) *)
+(** Assert that the classes are well formed @raise Typing.Error(location, comment) *)
 module Assert = struct
-  let dummy_loc = (Lexing.dummy_pos, Lexing.dummy_pos)
-
-  exception Error of Ast.location * string
-
-  (* use the following function to signal typing errors, e.g.
-      error ~loc "unbound variable %s" id
-*)
-  let error ?(loc = dummy_loc) f =
-    Format.kasprintf (fun s -> raise (Error (loc, s))) ("@[" ^^ f ^^ "@]")
-
   (**classes are uniquely defined*)
   let unique (p : Ast.pfile) =
     let class_count = Hashtbl.create (List.length p) in
@@ -62,7 +55,7 @@ module Assert = struct
       (fun ({ loc; id }, _, _) ->
         match Hashtbl.find_opt class_count id with
         | None -> Hashtbl.add class_count id ()
-        | Some () -> error ~loc "class %s already defined" id)
+        | Some () -> Typing.error ~loc "class %s already defined" id)
       p
 
   (**Classes do not inherit from String*)
@@ -73,7 +66,7 @@ module Assert = struct
         match extends with
         | Some extends when extends.id = "String" ->
             let loc = this.loc in
-            error ~loc "%s inherits from String" this.id
+            Typing.error ~loc "%s inherits from String" this.id
         | _ -> ())
 
   (**classes inherit from a class that is defined elsewhere*)
@@ -85,7 +78,8 @@ module Assert = struct
         | Some cls ->
             if not (Hashtbl.mem classes cls) then
               let { loc }, _, _ = pclass_from_string p this in
-              error ~loc "Invalid extends : superclass %s is never defined" this
+              Typing.error ~loc
+                "Invalid extends : superclass %s is never defined" this
         | _ -> ())
       classes
 
@@ -131,6 +125,6 @@ module Assert = struct
       (fun this _ ->
         if is_cycle classes in_cycle this this then
           let { loc }, _, _ = pclass_from_string p this in
-          error ~loc "%s is in cyclic dependency" this)
+          Typing.error ~loc "%s is in cyclic dependency" this)
       classes
 end
