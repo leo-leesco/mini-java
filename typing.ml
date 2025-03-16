@@ -137,6 +137,6 @@ let file ?debug:(b = false) (p : Ast.pfile) : Ast.tfile =
           }
     in
 
- let classes =  (Hashtbl.to_seq_keys classes) |> (Seq.map class_from_string) |> List.of_seq in
+let classes =  List.of_seq(Seq.map class_from_string(Hashtbl.to_seq_keys classes)) in
 
     failwith "TODO"
