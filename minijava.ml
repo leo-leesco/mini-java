@@ -59,7 +59,7 @@ let () =
       report (lexeme_start_p lb, lexeme_end_p lb);
       eprintf "syntax error@.";
       exit 1
-  | Typing.Error (loc, s) ->
+  | Assert.Error (loc, s) ->
       report loc;
       eprintf "error: %s@." s;
       exit 1
