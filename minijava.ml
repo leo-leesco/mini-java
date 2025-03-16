@@ -60,7 +60,7 @@ let () =
       eprintf "syntax error@.";
       exit 1
   | Typing.Error (loc, s) ->
-      report loc;
+      (match loc with Some loc -> report loc | None -> ());
       eprintf "error: %s@." s;
       exit 1
   | e ->

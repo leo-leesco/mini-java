@@ -55,7 +55,7 @@ module Assert = struct
       (fun ({ loc; id }, _, _) ->
         match Hashtbl.find_opt class_count id with
         | None -> Hashtbl.add class_count id ()
-        | Some () -> Typing.error ~loc "class %s already defined" id)
+        | Some () -> Typing.error ~loc:(Some loc) "class %s already defined" id)
       p
 
   (**Classes do not inherit from String*)
@@ -65,7 +65,7 @@ module Assert = struct
     | (this, extends, _) :: others -> (
         match extends with
         | Some extends when extends.id = "String" ->
-            let loc = this.loc in
+            let loc = Some this.loc in
             Typing.error ~loc "%s inherits from String" this.id
         | _ -> ())
 
@@ -78,7 +78,7 @@ module Assert = struct
         | Some cls ->
             if not (Hashtbl.mem classes cls) then
               let { loc }, _, _ = pclass_from_string p this in
-              Typing.error ~loc
+              Typing.error ~loc:(Some loc)
                 "Invalid extends : superclass %s is never defined" this
         | _ -> ())
       classes
@@ -125,6 +125,6 @@ module Assert = struct
       (fun this _ ->
         if is_cycle classes in_cycle this this then
           let { loc }, _, _ = pclass_from_string p this in
-          Typing.error ~loc "%s is in cyclic dependency" this)
+          Typing.error ~loc:(Some loc) "%s is in cyclic dependency" this)
       classes
 end
