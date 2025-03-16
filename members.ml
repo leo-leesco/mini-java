@@ -23,19 +23,33 @@ module Assert = struct
   let unique (class_tree : (string, class_) Hashtbl.t) (p : Ast.pfile) =
     Hashtbl.iter
       (fun name { class_name; class_extends; class_methods; class_attributes }
-         -> ())
+         -> ()) (* -> Hashtbl.iter (fun (methode methods) ->) *)
       class_tree
 
-  (** if given attribute exists within attrs (meant to be the rest) or within
-      parent class_
-      @raise Error(location,attribute)*)
-  let rec attr_not_exists (attr : string)
-      (attrs : (string, attribute) Hashtbl.t) (parent : class_ option) =
-    match Hashtbl.find_opt attrs attr with
+  (** if given attribute exists within attributes (meant to be the rest) or
+      within parent class_
+      @raise Error(attribute)*)
+  let rec attr_not_exists (attribut : string)
+      (attributes : (string, attribute) Hashtbl.t) (parent : class_ option) =
+    match Hashtbl.find_opt attributes attribut with
     | None -> (
         match parent with
         | None -> ()
-        | Some { class_name; class_extends; class_methods; class_attributes } ->
-            attr_not_exists attr class_attributes class_extends)
-    | Some _ -> Typing.error "attribute %s is already defined elsewhere" attr
+        | Some { class_extends; class_attributes } ->
+            attr_not_exists attribut class_attributes class_extends)
+    | Some _ ->
+        Typing.error "attribute %s is already defined elsewhere" attribut
+
+  (** if given meth exists within methods (meant to be the rest) or within
+      parent class_
+      @raise Error(meth)*)
+  let rec attr_not_exists (methode : string)
+      (methods : (string, method_) Hashtbl.t) (parent : class_ option) =
+    match Hashtbl.find_opt methods methode with
+    | None -> (
+        match parent with
+        | None -> ()
+        | Some { class_extends; class_methods } ->
+            attr_not_exists methode class_methods class_extends)
+    | Some _ -> Typing.error "method %s is already defined elsewhere" methode
 end
